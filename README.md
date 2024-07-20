@@ -178,4 +178,6 @@ type Patient struct {
 /patient/connectedDoctors    -> fetch the connected doctors of a patient
 /patient/files               -> fetch the files of a patient
 ```
+## Authentication
 
+A simple `JWT` token based authenticated is used in the project for simplicity which can be enhanced by using firebase in the project in future to have `Google` login and other types of login.
