@@ -1,0 +1,52 @@
+definitions:
+  interfaces.GenericResponse:
+    properties:
+      details: {}
+      error: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /health:
+    get:
+      consumes:
+      - '*/*'
+      description: get the status of server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Show the health of server.
+      tags:
+      - root
+  /opportunity:
+    post:
+      consumes:
+      - '*/*'
+      description: Creates the companyProfiles and returns the opportunity objects
+      parameters:
+      - description: message/rfc822
+        in: body
+        name: test
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/interfaces.GenericResponse'
+      summary: Create an opportunity
+      tags:
+      - root
+swagger: "2.0"

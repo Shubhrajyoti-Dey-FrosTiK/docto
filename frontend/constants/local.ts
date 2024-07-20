@@ -1,0 +1,1 @@
+export const LOCALSTORAGE_DOCTO_TOKEN = "DOCTO_TOKEN";
