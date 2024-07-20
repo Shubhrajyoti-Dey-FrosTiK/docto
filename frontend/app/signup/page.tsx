@@ -1,25 +1,24 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { z } from "zod";
-import { CreateDoctorRequest, CreateDoctorResponse } from "@/types/doctor";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FormEvent, FormEventHandler, useState } from "react";
-import PasswordStrengthBar from "react-password-strength-bar";
-import { Card } from "@/components/ui/card";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { CreatePatientRequest } from "@/types/patient";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
-import { Spinner } from "@material-tailwind/react";
-import axios, { AxiosResponse } from "axios";
-import { GenericResponse } from "@/types/request";
-import useLocalStorage from "use-local-storage";
 import { LOCALSTORAGE_DOCTO_TOKEN } from "@/constants/local";
-import { useRouter } from "next/navigation";
+import { CreateDoctorRequest, CreateDoctorResponse } from "@/types/doctor";
+import { CreatePatientRequest } from "@/types/patient";
+import { GenericResponse } from "@/types/request";
+import axios, { AxiosResponse } from "axios";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
+import PasswordStrengthBar from "react-password-strength-bar";
+import useLocalStorage from "use-local-storage";
+import { z } from "zod";
 
 interface SignupFormElemet {
   placeholder: string;
@@ -294,7 +293,7 @@ function Page() {
                         aria-errormessage="wfberg"
                         onChange={(e) => {
                           setPatientSignup({
-                            ...doctorSignup,
+                            ...patientSignup,
                             [formElement.formStateKey]: e.currentTarget.value,
                           });
                         }}
@@ -304,7 +303,13 @@ function Page() {
                 </TabsContent>
               </Tabs>
 
-              <PasswordStrengthBar password={doctorSignup.password} />
+              <PasswordStrengthBar
+                password={
+                  signupMode === SignupType.DOCTOR
+                    ? doctorSignup.password
+                    : patientSignup.password
+                }
+              />
 
               <Button disabled={loading} type="submit" className="w-full my-2">
                 {/* @ts-ignore */}
