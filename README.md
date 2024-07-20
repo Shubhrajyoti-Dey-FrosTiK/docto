@@ -86,7 +86,96 @@ The `BACKEND_URL` is already set to `8084` in the `frontend` env as well as the 
 ![Capture-2024-07-20-193242](https://github.com/user-attachments/assets/25f97602-0103-4d97-8969-6b2c52e6250d)
 
 
+## Implementation
+
+### DB Schema
+
+```.go
+
+type Doctor struct {
+	gorm.Model
+
+	ID          uint      `gorm:"primaryKey"` // id of the doctor
+	Name        string    // name of the doctor
+	Email       string    `gorm:"uniqueIndex"` // email of the patient
+	Designation string    // eg. MBBS etc
+	Headline    string    // eg. Chief of surgery at AIMS Delhi
+	Patients    []Patient `gorm:"OnDelete:SET ARRAY[]::varchar[]; many2many:doctor_patients;"`
+	Files       []File    `gorm:"OnDelete:SET ARRAY[]::varchar[]; many2many:doctor_files;"`
+
+	// Sensitive
+	Password string // Will be hashed before being inserted
+
+	CreatedAt int64 `gorm:"autoCreateTime"`
+	UpdatedAt int64 `gorm:"autoUpdateTime"`
+}
 
 
+type File struct {
+	gorm.Model
 
+	ID       uint `gorm:"primaryKey"` // id of the file
+	Url      string
+	Key      string
+	FileName string
+
+	DoctorID  uint
+	PatientID uint
+
+	CreatedAt int64 `gorm:"autoCreateTime"`
+	UpdatedAt int64 `gorm:"autoUpdateTime"`
+}
+
+
+type Patient struct {
+	gorm.Model
+
+	ID      uint     `gorm:"primaryKey"` // id of the patient
+	Name    string   // name of the patient
+	Email   string   `gorm:"uniqueIndex"` // email of the patient
+	Files   []File   `gorm:"OnDelete:SET ARRAY[]::varchar[]; many2many:patient_files;"`
+	Doctors []Doctor `gorm:"OnDelete:SET ARRAY[]::varchar[]; many2many:doctor_patients;"`
+
+	// Sensitive
+	Password string // Will be hashed before being inserted
+
+	CreatedAt int64 `gorm:"autoCreateTime"`
+	UpdatedAt int64 `gorm:"autoUpdateTime"`
+}
+
+```
+
+## Endpoints
+### Non-Authenticated
+```
+/health  -> health of the server
+/metrics -> metrics of usage of the server
+
+/doctor/create -> Creates a doctor
+/doctor/login  -> Logs in a doctor
+
+/patient/create -> Creates a patient
+/patient/login  -> Logs in a patient
+```
+
+### Authenticated Routes
+```
+/assign/patient -> assigns a patient to a doctor (invoker must be a doctor)
+/assign/doctor  -> assigns a doctor to a patient (invoker must be a patient)
+
+/token/verify -> provides information like validity, userId, userType (doctor/patient) from a token
+
+/doctor/upload               -> to upload files and attach it to a doctor
+/doctor/populated/patient    -> to fetch the doctor and its associated patients
+/doctor/populated/connection -> to fetch the doctor info and check if the invoker (patient) is connected witn the doctor
+/doctor/search               -> search doctors using name, email and id
+/doctor/connectedPatients    -> fetch the connected patients of a doctor
+/doctor/files                -> fetch the files of a doctor
+
+/patient/upload              -> to upload files and attach it to a patient
+/patient/populated/connection-> to fetch the patient info and check if the invoker (doctor) is connected witn the patient
+/patient/search              -> search patients using name, email and id
+/patient/connectedDoctors    -> fetch the connected doctors of a patient
+/patient/files               -> fetch the files of a patient
+```
 
